@@ -3,9 +3,6 @@ import streamlit as st
 import socket
 import requests
 import re
-from tkinter import messagebox
-import tkinter as tk
-from tkinter import Entry, Label, Tk
 import random
 import time
 #import pyperclip
