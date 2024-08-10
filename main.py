@@ -2,7 +2,7 @@ import streamlit as st
 
 
 # 제목 설정
-st.title("한글/영어 구분 및 글자수 세기 애플리케이션")
+st.title("한글 글자수 세기 by 철인29호")
 
 # 사용자로부터 텍스트 입력받기
 user_input = st.text_area("텍스트를 입력하세요:")
