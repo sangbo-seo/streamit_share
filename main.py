@@ -110,7 +110,7 @@ if st.button('정지'):
     st.components.v1.html(js_code2)
 
 # '플레이스 방문 시작' 버튼
-if st.button('플레이스 방문 시작'):
+if st.button('플레이스 방문'):
     st.session_state.stop = False  # 중단 상태 초기화
     for site_url in urls:
         if st.session_state.stop:
