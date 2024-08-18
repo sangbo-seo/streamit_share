@@ -94,6 +94,10 @@ urls =[
 ]
      
 
+# '정지' 버튼
+if st.button('정지'):
+    st.session_state.stop = True
+    st.write("플레이스 방문이 중단되었습니다.")
 
 # '플레이스 방문 시작' 버튼
 if st.button('플레이스 방문 시작'):
@@ -111,9 +115,5 @@ if st.button('플레이스 방문 시작'):
         st.components.v1.html(js_code1)
         random_delay()
 
-# '정지' 버튼
-if st.button('정지'):
-    st.session_state.stop = True
-    st.write("플레이스 방문이 중단되었습니다.")
 
 
