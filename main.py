@@ -98,22 +98,35 @@ urls =[
 if st.button('정지'):
     st.session_state.stop = True
     st.write("플레이스 방문이 중단되었습니다.")
+    
+    # 열려 있는 창 닫기
+    js_code2 = """
+    <script type="text/javascript">
+        if (typeof(window.new_window) !== 'undefined' && !window.new_window.closed) {
+            window.new_window.close();
+        }
+    </script>
+    """
+    st.components.v1.html(js_code2)
 
 # '플레이스 방문 시작' 버튼
 if st.button('플레이스 방문 시작'):
-    st.session_state.stop = False  # 버튼을 누르면 중단 상태를 False로 초기화
+    st.session_state.stop = False  # 중단 상태 초기화
     for site_url in urls:
         if st.session_state.stop:
             st.write("플레이스 방문이 중단되었습니다.")
             break
 
+        # 같은 창에 새로운 URL 열기
         js_code1 = f"""
         <script type="text/javascript">
-            window.open("{site_url}");
+            if (typeof(window.new_window) === 'undefined' || window.new_window.closed) {{
+                window.new_window = window.open("{site_url}", "_blank");
+            }} else {{
+                window.new_window.location.href = "{site_url}";
+            }}
         </script>
         """
         st.components.v1.html(js_code1)
         random_delay()
-
-
 
