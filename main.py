@@ -151,7 +151,7 @@ urls1 =[
      
 
 # '정지' 버튼
-if st.button('정지'):
+if st.button('정지1'):
     st.session_state.stop = True
     st.write("플레이스 방문이 중단되었습니다.")
     
