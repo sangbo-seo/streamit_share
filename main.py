@@ -92,18 +92,8 @@ urls =[
 "https://m.search.naver.com/p/crd/rd?m=1&px=60&py=1641&sx=60&sy=641&vw=265&vh=1142&p=iVZCSwprcI0ssAC77%2BVssssstZN-063466&q=%EC%9D%B4%EB%8C%80%EA%B3%B5%EA%B0%84%EB%8C%80%EC%97%AC%EC%B2%A0%EB%B6%80%EC%A7%80&ie=utf8&rev=1&ssc=tab.m.all&f=m&w=m&s=CE%2Fb%2BBdv45LE7NHz0aY2Gg%3D%3D&time=1723933802272&abt=%5B%7B%22eid%22%3A%22SHP-SUPER-ITEM%22%2C%22vid%22%3A%228%22%7D%5D&a=loc_plc.tit&r=1&i=1328568186&u=https%3A%2F%2Fm.place.naver.com%2Fplace%2F1328568186%3Fentry%3Dpll&cr=2",
 "https://cr.shopping.naver.com/adcr.nhn?x=Sxyo9tY8Sz556j4lVTmalv%2F%2F%2Fw%3D%3DsCd2csxrMISV%2BsXhVgD2Y2Oy806JihL3GnEmZXCJWa6X5tiKZUBQMxkkEWTXZlvF0J%2FfGWgxwbajNyGqblMF3U13pPykeAew47hBo3jfBxDBgMHnVM3zOE17Fy9SuoHExW4qWbL2vEyBbDC3wBdyv%2BLcZ37YrGmisNh7yxm9y8NQeMDmqDMbtkp7clROyzAFJVHcHPYYqn1w3KgNx5W5C5RoE4mTP587sKtn3srJAJm4Q30gwb0ZAWnfX3Zzr1ayR4uxanfK20CgJFMCKm453GTq1461dr8WFIbmNnTE6ozmAmJE%2B5eaTcbwcZxhrtnWXwc%2B%2FjkR2vl%2B%2B%2B%2F%2BVPNlrhdPwrPAvSux8OttNTn%2F%2FJ3M6MaNaJsB2ca0q11PK4%2BUpe53XaJOElESYjnSgRW0u0xUhwUNj8hcxgfTh7UKrKuA4DAOMd%2BFJ4hR32YD2NdWFULnLIyzs0rzJg9qQnlt2Gf6dV35cdwMDWeF9F8c%2Bdm34mMqBVdezTmommzqNglGZsshB3dJAUfgJLyBnH8%2F0ffFm15i8T6uFHIFT1wVATLKBWLgIBe3ntRkQ5ahRn3j3rXJHmKeb1XNbYp9ofaudiIXot%2FfxMshdPrq%2F7ptcC3eOfMerGoHG30nnwR04LSE1wgMV6fl5Dp7gjPmsfWUM9Vv4DRANwgRcIhYeoW1Ior11p8Ut0%2FQ4ibLyMk%2FVAoLJvUx104bnSp6IlX0B2gLIIm9dfcZLmf8bvGlrVcv0vCBXc50eBITwugSNPH3Ok09sVpGw61BSdoQRvEGgfFlc5w%3D%3D&nvMid=88259004754&catId=50007254",
 ]
+     
 
-
-# 버튼 클릭 시 JavaScript로 새 창 열기
-if st.button('플레이스 방문 시작'):
-    for site_url in urls:
-        js_code1 = f"""
-        <script type="text/javascript">
-            window.open("{site_url}");
-        </script>
-        """
-        st.components.v1.html(js_code1)
-        random_delay()
 
 # '플레이스 방문 시작' 버튼
 if st.button('플레이스 방문 시작'):
