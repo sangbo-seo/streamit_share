@@ -166,7 +166,7 @@ if st.button('정지1'):
     st.components.v1.html(js_code4)
 
 # '플레이스 방문 시작' 버튼
-if st.button('플레이스 방문'):
+if st.button('플레이스 방문1'):
     st.session_state.stop = False  # 중단 상태 초기화
     for i in range(0,10000):
         for site_url in urls1:
