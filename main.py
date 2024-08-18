@@ -4,6 +4,11 @@ import random
 import time
 
 
+def random_delay(min_delay=30, max_delay=150):
+    """랜덤한 시간 동안 지연시키는 함수"""
+    delay = random.uniform(min_delay, max_delay)
+    print(f"Sleeping for {delay:.2f} seconds")
+    time.sleep(delay)
 
 
 # 제목 설정
@@ -65,19 +70,12 @@ if st.button("디코딩"):
 
 
 # Streamlit 앱 제목
-st.title("플레이스 순서대로 방문")
+st.title("플레이스 순서대로 방문[철인29호]")
 
 
 # 초기 상태 설정
 if 'stop' not in st.session_state:
     st.session_state.stop = False
-
-
-def random_delay(min_delay=30, max_delay=150):
-    """랜덤한 시간 동안 지연시키는 함수"""
-    delay = random.uniform(min_delay, max_delay)
-    print(f"Sleeping for {delay:.2f} seconds")
-    time.sleep(delay)
 
 # 사용자로부터 URL 입력받기
 urls =[
@@ -112,21 +110,82 @@ if st.button('정지'):
 # '플레이스 방문 시작' 버튼
 if st.button('플레이스 방문'):
     st.session_state.stop = False  # 중단 상태 초기화
-    for site_url in urls:
-        if st.session_state.stop:
-            st.write("플레이스 방문이 중단되었습니다.")
-            break
+    for i in range(0,10000):    
+        for site_url in urls:
+            if st.session_state.stop:
+                st.write("플레이스 방문이 중단되었습니다.")
+                break
 
-        # 같은 창에 새로운 URL 열기
-        js_code1 = f"""
-        <script type="text/javascript">
-            if (typeof(window.new_window) === 'undefined' || window.new_window.closed) {{
-                window.new_window = window.open("{site_url}", "_blank");
-            }} else {{
-                window.new_window.location.href = "{site_url}";
-            }}
-        </script>
-        """
-        st.components.v1.html(js_code1)
-        random_delay()
+            # 같은 창에 새로운 URL 열기
+            js_code1 = f"""
+            <script type="text/javascript">
+                if (typeof(window.new_window) === 'undefined' || window.new_window.closed) {{
+                    window.new_window = window.open("{site_url}", "_blank");
+                }} else {{
+                    window.new_window.location.href = "{site_url}";
+                }}
+            </script>
+            """
+            st.components.v1.html(js_code1)
+            random_delay()
+
+
+
+# Streamlit 앱 제목
+st.title("플레이스 순서대로 방문[Bros]")
+
+
+# 초기 상태 설정
+if 'stop' not in st.session_state:
+    st.session_state.stop = False
+
+
+# 사용자로부터 URL 입력받기
+urls1 =[
+    "https://m.blog.naver.com/dongnebros/223551645464",
+    "https://m.blog.naver.com/dongnebros/223550514404",
+    "https://m.blog.naver.com/dongnebros/223543231597",
+    "https://m.blog.naver.com/dongnebros/223529949998",
+    "https://m.blog.naver.com/dongnebros/223528378911",
+]
+     
+
+# '정지' 버튼
+if st.button('정지'):
+    st.session_state.stop = True
+    st.write("플레이스 방문이 중단되었습니다.")
+    
+    # 열려 있는 창 닫기
+    js_code4 = """
+    <script type="text/javascript">
+        if (typeof(window.new_window) !== 'undefined' && !window.new_window.closed) {
+            window.new_window.close();
+        }
+    </script>
+    """
+    st.components.v1.html(js_code4)
+
+# '플레이스 방문 시작' 버튼
+if st.button('플레이스 방문'):
+    st.session_state.stop = False  # 중단 상태 초기화
+    for i in range(0,10000):
+        for site_url in urls1:
+            if st.session_state.stop:
+                st.write("사이트 방문이 중단되었습니다.")
+                break
+
+            # 같은 창에 새로운 URL 열기
+            js_code3 = f"""
+            <script type="text/javascript">
+                if (typeof(window.new_window) === 'undefined' || window.new_window.closed) {{
+                    window.new_window = window.open("{site_url}", "_blank");
+                }} else {{
+                    window.new_window.location.href = "{site_url}";
+                }}
+            </script>
+            """
+            st.components.v1.html(js_code3)
+            random_delay()
+    
+
 
