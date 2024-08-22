@@ -122,6 +122,7 @@ if st.button('플레이스 방문'):
                 if (typeof(window.new_window) === 'undefined' || window.new_window.closed) {{
                     window.new_window = window.open("{site_url}", "_blank");
                 }} else {{
+                    window.new_window.close();
                     window.new_window.location.href = "{site_url}";
                 }}
             </script>
