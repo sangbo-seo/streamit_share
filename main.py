@@ -80,7 +80,7 @@ image_path = 'image.jpg'
 image = Image.open(image_path)
 
 # 이미지 화면에 표시
-st.image(image, caption='저장된 이미지', use_column_width=True)
+st.image(image, caption='네이버 좋댓펌 프로그램/ 플레이스 방문 실행 프로그램 화면', use_column_width=True)
 
 
 # 초기 상태 설정
