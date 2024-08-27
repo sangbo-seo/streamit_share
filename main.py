@@ -2,7 +2,7 @@ import streamlit as st
 from urllib.parse import quote, unquote
 import random
 import time
-
+from PIL import Image
 
 def random_delay(min_delay=30, max_delay=150):
     """랜덤한 시간 동안 지연시키는 함수"""
@@ -71,6 +71,16 @@ if st.button("디코딩"):
 
 # Streamlit 앱 제목
 st.title("플레이스 순서대로 방문[철인29호]")
+
+
+# 저장된 이미지 파일 경로
+image_path = 'image.jpg'
+
+# 이미지 열기
+image = Image.open(image_path)
+
+# 이미지 화면에 표시
+st.image(image, caption='저장된 이미지', use_column_width=True)
 
 
 # 초기 상태 설정
