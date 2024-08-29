@@ -40,7 +40,7 @@ def getResult(client_id, client_secret, keyword_list):
     
     # 결과 리스트
     results = []
-    for i in range(0, min(5, len(json_object['items']))):  # 상위 5개의 결과만 표시
+    for i in range(0, min(10, len(json_object['items']))):  # 상위 5개의 결과만 표시
         title = json_object['items'][i]['title'].replace('<b>', "").replace('</b>', "")
         mallName = json_object['items'][i]['link']
         bloggerID = json_object['items'][i]['bloggerlink'].replace('blog.naver.com/', "")
