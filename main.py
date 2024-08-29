@@ -3,6 +3,12 @@ from urllib.parse import quote, unquote
 import random
 import time
 from PIL import Image
+import requests
+import urllib.request
+import json
+from datetime import datetime
+
+
 
 def random_delay(min_delay=30, max_delay=150):
     """랜덤한 시간 동안 지연시키는 함수"""
@@ -10,7 +16,65 @@ def random_delay(min_delay=30, max_delay=150):
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)
 
+def getResult(client_id, client_secret, keyword_list):    
+    current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    keyword = keyword_list
+    encText = urllib.parse.quote(keyword) 
+    
+    shop_url = "https://openapi.naver.com/v1/search/blog?query=" + encText + "&display=100&start=1" #100순위
+    
+    request = urllib.request.Request(shop_url) 
+    request.add_header("X-Naver-Client-Id", client_id)
+    request.add_header("X-Naver-Client-Secret", client_secret)
+    response = urllib.request.urlopen(request)
+    rescode = response.getcode()
+    if(rescode == 200):
+        response_body = response.read()
+        json_str = response_body.decode('utf-8')
+    else:
+        st.error(f"Error Code: {rescode}")
+        return []
+    
+    json_object = json.loads(json_str) #json 변환
+    
+    # 결과 리스트
+    results = []
+    for i in range(0, min(5, len(json_object['items']))):  # 상위 5개의 결과만 표시
+        title = json_object['items'][i]['title'].replace('<b>', "").replace('</b>', "")
+        mallName = json_object['items'][i]['link']
+        bloggerID = json_object['items'][i]['bloggerlink'].replace('blog.naver.com/', "")
+        results.append({
+            "Title": title,
+            "Blogger ID": bloggerID,
+            "Link": mallName
+        })
+    
+    return results
 
+# Streamlit UI
+st.title('네이버 블로그 순위 조회')
+
+client_id = st.text_input('Client ID')
+client_secret = st.text_input('Client Secret', type="password")
+keyword = st.text_input('키워드를 입력하세요')
+
+if st.button('검색'):
+    if client_id and client_secret and keyword:
+        results = getResult(client_id, client_secret, keyword)
+        if results:
+            for i, result in enumerate(results):
+                st.write(f"**{i+1}. {result['Title']}**")
+                st.write(f"  - Blogger ID: {result['Blogger ID']}")
+                st.write(f"  - [Link]({result['Link']})")
+        else:
+            st.write("검색 결과가 없습니다.")
+    else:
+        st.error("Client ID, Client Secret, 그리고 키워드를 모두 입력하세요.")
+
+
+
+#--------------------------
 # 제목 설정
 st.title("한글 글자수 세기 by 철인29호")
 
