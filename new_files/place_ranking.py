@@ -1,10 +1,15 @@
 import streamlit as st
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+
+# 웹드라이버 초기화 부분
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service)
+
 
 @st.cache_resource
 def get_driver():
