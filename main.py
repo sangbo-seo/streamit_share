@@ -7,8 +7,16 @@ import requests
 import urllib.request
 import json
 from datetime import datetime
+import importlib.util
+import os
 
 
+def load_module(module_name):
+    module_path = os.path.join('new_files', f'{module_name}.py')
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 def random_delay(min_delay=30, max_delay=150):
     """랜덤한 시간 동안 지연시키는 함수"""
@@ -51,6 +59,26 @@ def getResult(client_id, client_secret, keyword_list):
         })
     
     return results
+
+
+
+
+st.title('플레이스 랭킹 앱')
+
+# place_ranking.py 모듈 로드
+place_ranking = load_module('place_ranking')
+
+# place_ranking.py의 main 함수 실행 (만약 존재한다면)
+if hasattr(place_ranking, 'main'):
+    place_ranking.main()
+else:
+    st.error("place_ranking.py에 main 함수가 없습니다.")
+
+# 또는 place_ranking.py의 특정 함수들을 직접 호출할 수 있습니다
+# 예를 들어:
+# if hasattr(place_ranking, 'show_rankings'):
+#     place_ranking.show_rankings()
+
 
 # Streamlit UI
 st.title('네이버 블로그 순위 조회')
