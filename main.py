@@ -9,7 +9,10 @@ import json
 from datetime import datetime
 import importlib.util
 import os
-
+from konlpy.tag import Komoran
+import pandas as pd
+from collections import Counter
+import re
 
 def load_module(module_name):
     module_path = os.path.join('new_files', f'{module_name}.py')
@@ -80,31 +83,233 @@ def getResult(client_id, client_secret, keyword_list):
 #     place_ranking.show_rankings()
 
 
-# Streamlit UI
-st.title('네이버 블로그 순위 조회')
 
-client_id = st.text_input('Client ID')
-client_secret = st.text_input('Client Secret', type="password")
-keyword = st.text_input('키워드를 입력하세요')
+def count_characters(text):
+    """텍스트의 글자수를 계산하는 함수"""
+    # 전체 글자수
+    total_chars = len(text)
+    chars_without_spaces = len(text.replace(' ', ''))
+    
+    # 한글만 추출하여 계산
+    korean_text = re.findall('[가-힣]', text)
+    korean_chars = len(korean_text)
+    
+    # 공백을 포함한 한글 텍스트 추출
+    korean_text_with_spaces = re.sub('[^가-힣\s]', '', text)
+    korean_chars_with_spaces = len(korean_text_with_spaces)
+    korean_chars_without_spaces = len(korean_text_with_spaces.replace(' ', ''))
+    
+    # 단어 수와 줄 수
+    words = len(text.split())
+    lines = len(text.splitlines())
+    
+    return {
+        'total_chars': total_chars,                          # 전체 글자수 (공백 포함)
+        'chars_without_spaces': chars_without_spaces,        # 전체 글자수 (공백 제외)
+        'korean_chars_with_spaces': korean_chars_with_spaces,    # 한글 글자수 (공백 포함)
+        'korean_chars_without_spaces': korean_chars_without_spaces,  # 한글 글자수 (공백 제외)
+        'korean_chars': korean_chars,                        # 순수 한글 글자수
+        'words': words,                                      # 단어 수
+        'lines': lines                                       # 줄 수
+    }
 
-if st.button('검색'):
-    if client_id and client_secret and keyword:
-        results = getResult(client_id, client_secret, keyword)
+def analyze_text(text, analyzer):
+    """텍스트 분석을 수행하는 함수"""
+    try:
+        # 글자수 분석
+        char_counts = count_characters(text)
+        
+        # 형태소 분석
+        pos_results = analyzer.pos(text)
+        morphs = analyzer.morphs(text)
+        nouns = analyzer.nouns(text)
+        
+        # 빈도 분석
+        noun_count = Counter(nouns)
+        freq_df = pd.DataFrame(noun_count.most_common(), columns=['단어', '빈도'])
+        freq_df.index = range(1, len(freq_df) + 1)
+        
+        # 품사 태깅 결과를 DataFrame으로 변환
+        pos_df = pd.DataFrame(pos_results, columns=['단어', '품사'])
+        pos_df.index = range(1, len(pos_df) + 1)
+        
+        return {
+            'freq_df': freq_df,
+            'pos_df': pos_df,
+            'morphs': morphs,
+            'nouns': nouns,
+            'char_counts': char_counts
+        }
+    except Exception as e:
+        st.error(f"분석 중 오류가 발생했습니다: {str(e)}")
+        return None
+
+
+# 페이지 설정
+st.set_page_config(
+    page_title="한글 형태소 분석기",
+    page_icon="🇰🇷",
+    layout="wide"
+)
+
+# 제목
+st.title("한글 형태소 분석기 🇰🇷")
+
+try:
+    # Komoran 초기화
+    analyzer = Komoran()
+    
+    # 사이드바 설정
+    st.sidebar.title("설정")
+    st.sidebar.markdown("""
+    ### 사용 방법
+    1. 분석할 텍스트를 입력하세요
+    2. 분석 결과는 자동으로 업데이트됩니다
+    
+    ### 형태소 분석기 정보
+    - 사용 분석기: Komoran
+    - 개발: Shineware
+    """)
+    
+    # 메인 영역
+    text_input = st.text_area(
+        "분석할 텍스트를 입력하세요:",
+        height=200,
+        placeholder="여기에 텍스트를 입력하세요..."
+    )
+    
+    if text_input:
+        # 분석 수행
+        results = analyze_text(text_input, analyzer)
+        
         if results:
-            for i, result in enumerate(results):
-                st.write(f"**{i+1}. {result['Title']}**")
-                st.write(f"  - Blogger ID: {result['Blogger ID']}")
-                st.write(f"  - [Link]({result['Link']})")
-        else:
-            st.write("검색 결과가 없습니다.")
-    else:
-        st.error("Client ID, Client Secret, 그리고 키워드를 모두 입력하세요.")
+            # 글자수 통계 표시
+            st.markdown("### 📊 텍스트 통계")
+            
+            # 전체 글자수
+            st.markdown("#### 전체 글자수")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("전체 글자수 (공백 포함)", 
+                            results['char_counts']['total_chars'])
+            with col2:
+                st.metric("전체 글자수 (공백 제외)", 
+                            results['char_counts']['chars_without_spaces'])
+            
+            # 한글 글자수
+            st.markdown("#### 한글 글자수")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("한글 글자수 (공백 포함)", 
+                            results['char_counts']['korean_chars_with_spaces'])
+            with col2:
+                st.metric("한글 글자수 (공백 제외)", 
+                            results['char_counts']['korean_chars_without_spaces'])
+            
+            # 기타 통계
+            st.markdown("#### 기타 통계")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("순수 한글 문자 수", 
+                            results['char_counts']['korean_chars'])
+            with col2:
+                st.metric("단어 수", 
+                            results['char_counts']['words'])
+            with col3:
+                st.metric("줄 수", 
+                            results['char_counts']['lines'])
+            
+            st.markdown("---")
+            
+            # 탭 생성
+            tab1, tab2, tab3, tab4 = st.tabs([
+                "빈도 분석", "품사 태깅", "형태소", "명사"
+            ])
+            
+            # 탭1: 빈도 분석
+            with tab1:
+                st.subheader("단어 빈도 분석")
+                
+                # 데이터프레임 스타일링
+                st.markdown("""
+                <style>
+                .dataframe {
+                    font-size: 1.1rem;
+                    font-family: sans-serif;
+                }
+                .dataframe th {
+                    background-color: #f0f2f6;
+                    padding: 10px;
+                }
+                .dataframe td {
+                    padding: 8px;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                st.dataframe(
+                    results['freq_df'],
+                    use_container_width=True,
+                    hide_index=False
+                )
+                
+                if len(results['freq_df']) > 0:
+                    st.subheader("상위 10개 단어 빈도 차트")
+                    top_10 = results['freq_df'].head(10)
+                    st.bar_chart(
+                        data=top_10.set_index('단어')['빈도'],
+                        use_container_width=True
+                    )
+            
+            # 탭2: 품사 태깅
+            with tab2:
+                st.subheader("품사 태깅 결과")
+                st.dataframe(
+                    results['pos_df'],
+                    use_container_width=True,
+                    hide_index=False
+                )
+            
+            # 탭3: 형태소
+            with tab3:
+                st.subheader("형태소 분석 결과")
+                morphs_text = ', '.join(results['morphs'])
+                st.text_area(
+                    "형태소 목록:",
+                    value=morphs_text,
+                    height=200,
+                    disabled=True
+                )
+            
+            # 탭4: 명사
+            with tab4:
+                st.subheader("명사 추출 결과")
+                nouns_text = ', '.join(results['nouns'])
+                st.text_area(
+                    "명사 목록:",
+                    value=nouns_text,
+                    height=200,
+                    disabled=True
+                )
+            
+            # 형태소 분석 통계
+            st.markdown("### 📊 형태소 분석 통계")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("총 형태소 수", len(results['morphs']))
+            with col2:
+                st.metric("고유 명사 수", len(set(results['nouns'])))
+            with col3:
+                st.metric("총 단어 수", len(results['pos_df']))
+            
+except Exception as e:
+    st.error(f"프로그램 초기화 중 오류가 발생했습니다: {str(e)}")
 
 
 
 #--------------------------
 # 제목 설정
-st.title("한글 글자수 세기 by 철인29호")
+st.title("한글 글자수 세기")
 
 # 사용자로부터 텍스트 입력받기
 user_input = st.text_area("텍스트를 입력하세요:")
@@ -143,6 +348,31 @@ if st.button('새 창으로 열기'):
     </script>
     """
     st.components.v1.html(js_code)
+
+
+
+# Streamlit UI
+st.title('네이버 블로그 순위 조회')
+
+client_id = st.text_input('Client ID')
+client_secret = st.text_input('Client Secret', type="password")
+keyword = st.text_input('키워드를 입력하세요')
+
+if st.button('검색'):
+    if client_id and client_secret and keyword:
+        results = getResult(client_id, client_secret, keyword)
+        if results:
+            for i, result in enumerate(results):
+                st.write(f"**{i+1}. {result['Title']}**")
+                st.write(f"  - Blogger ID: {result['Blogger ID']}")
+                st.write(f"  - [Link]({result['Link']})")
+        else:
+            st.write("검색 결과가 없습니다.")
+    else:
+        st.error("Client ID, Client Secret, 그리고 키워드를 모두 입력하세요.")
+
+
+
 
 
 # Streamlit 앱 제목
@@ -232,64 +462,3 @@ if st.button('플레이스 방문'):
             """
             st.components.v1.html(js_code1)
             random_delay()
-
-
-
-# Streamlit 앱 제목
-st.title("플레이스 순서대로 방문[Bros]")
-
-
-# 초기 상태 설정
-if 'stop' not in st.session_state:
-    st.session_state.stop = False
-
-
-# 사용자로부터 URL 입력받기
-urls1 =[
-    "https://m.blog.naver.com/dongnebros/223551645464",
-    "https://m.blog.naver.com/dongnebros/223550514404",
-    "https://m.blog.naver.com/dongnebros/223543231597",
-    "https://m.blog.naver.com/dongnebros/223529949998",
-    "https://m.blog.naver.com/dongnebros/223528378911",
-]
-     
-
-# '정지' 버튼
-if st.button('정지1'):
-    st.session_state.stop = True
-    st.write("플레이스 방문이 중단되었습니다.")
-    
-    # 열려 있는 창 닫기
-    js_code4 = """
-    <script type="text/javascript">
-        if (typeof(window.new_window) !== 'undefined' && !window.new_window.closed) {
-            window.new_window.close();
-        }
-    </script>
-    """
-    st.components.v1.html(js_code4)
-
-# '플레이스 방문 시작' 버튼
-if st.button('플레이스 방문1'):
-    st.session_state.stop = False  # 중단 상태 초기화
-    for i in range(0,10000):
-        for site_url in urls1:
-            if st.session_state.stop:
-                st.write("사이트 방문이 중단되었습니다.")
-                break
-
-            # 같은 창에 새로운 URL 열기
-            js_code3 = f"""
-            <script type="text/javascript">
-                if (typeof(window.new_window) === 'undefined' || window.new_window.closed) {{
-                    window.new_window = window.open("{site_url}", "_blank");
-                }} else {{
-                    window.new_window.location.href = "{site_url}";
-                }}
-            </script>
-            """
-            st.components.v1.html(js_code3)
-            random_delay()
-    
-
-
