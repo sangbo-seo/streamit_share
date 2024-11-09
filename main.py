@@ -22,7 +22,7 @@ def load_module(module_name):
     return module
 
 def random_delay(min_delay=30, max_delay=150):
-    
+    """랜덤한 시간 동안 지연시키는 함수"""
     delay = random.uniform(min_delay, max_delay)
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)
@@ -66,16 +66,16 @@ def getResult(client_id, client_secret, keyword_list):
 
 
 
-# st.title('플레이스 랭킹 앱')
+st.title('플레이스 랭킹 앱')
 
-# # place_ranking.py 모듈 로드
-# place_ranking = load_module('place_ranking')
+# place_ranking.py 모듈 로드
+place_ranking = load_module('place_ranking')
 
-# # place_ranking.py의 main 함수 실행 (만약 존재한다면)
-# if hasattr(place_ranking, 'main'):
-#     place_ranking.main()
-# else:
-#     st.error("place_ranking.py에 main 함수가 없습니다.")
+# place_ranking.py의 main 함수 실행 (만약 존재한다면)
+if hasattr(place_ranking, 'main'):
+    place_ranking.main()
+else:
+    st.error("place_ranking.py에 main 함수가 없습니다.")
 
 # 또는 place_ranking.py의 특정 함수들을 직접 호출할 수 있습니다
 # 예를 들어:
