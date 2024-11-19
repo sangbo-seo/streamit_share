@@ -13,12 +13,6 @@ import pandas as pd
 from collections import Counter
 import re
 
-def load_module(module_name):
-    module_path = os.path.join('new_files', f'{module_name}.py')
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 def random_delay(min_delay=30, max_delay=150):
     """랜덤한 시간 동안 지연시키는 함수"""
@@ -26,60 +20,6 @@ def random_delay(min_delay=30, max_delay=150):
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)
 
-def getResult(client_id, client_secret, keyword_list):    
-    current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-    keyword = keyword_list
-    encText = urllib.parse.quote(keyword) 
-    
-    shop_url = "https://openapi.naver.com/v1/search/blog?query=" + encText + "&display=100&start=1" #100순위
-    
-    request = urllib.request.Request(shop_url) 
-    request.add_header("X-Naver-Client-Id", client_id)
-    request.add_header("X-Naver-Client-Secret", client_secret)
-    response = urllib.request.urlopen(request)
-    rescode = response.getcode()
-    if(rescode == 200):
-        response_body = response.read()
-        json_str = response_body.decode('utf-8')
-    else:
-        st.error(f"Error Code: {rescode}")
-        return []
-    
-    json_object = json.loads(json_str) #json 변환
-    
-    # 결과 리스트
-    results = []
-    for i in range(0, min(10, len(json_object['items']))):  # 상위 5개의 결과만 표시
-        title = json_object['items'][i]['title'].replace('<b>', "").replace('</b>', "")
-        mallName = json_object['items'][i]['link']
-        bloggerID = json_object['items'][i]['bloggerlink'].replace('blog.naver.com/', "")
-        results.append({
-            "Title": title,
-            "Blogger ID": bloggerID,
-            "Link": mallName
-        })
-    
-    return results
-
-
-
-
-st.title('플레이스 랭킹 앱')
-
-# place_ranking.py 모듈 로드
-place_ranking = load_module('place_ranking')
-
-# place_ranking.py의 main 함수 실행 (만약 존재한다면)
-if hasattr(place_ranking, 'main'):
-    place_ranking.main()
-else:
-    st.error("place_ranking.py에 main 함수가 없습니다.")
-
-# 또는 place_ranking.py의 특정 함수들을 직접 호출할 수 있습니다
-# 예를 들어:
-# if hasattr(place_ranking, 'show_rankings'):
-#     place_ranking.show_rankings()
 
 
 #--------------------------
@@ -107,44 +47,6 @@ if st.button('글자수 계산'):
     #st.write(f"한글 글자 수: {len(korean_text)}자")
     #st.write(f"영어 글자 수: {len(english_text)}자")
 
-
-
-# Streamlit 앱 제목
-st.title("형태소 분석기 가기")
-
-# 사용자로부터 URL 입력받기
-url = 'https://whereispost.com/morpheme/#google_vignette'
-
-# 버튼 클릭 시 JavaScript로 새 창 열기
-if st.button('새 창으로 열기'):
-    js_code = f"""
-    <script type="text/javascript">
-        window.open("{url}");
-    </script>
-    """
-    st.components.v1.html(js_code)
-
-
-
-# Streamlit UI
-st.title('네이버 블로그 순위 조회')
-
-client_id = st.text_input('Client ID')
-client_secret = st.text_input('Client Secret', type="password")
-keyword = st.text_input('키워드를 입력하세요')
-
-if st.button('검색'):
-    if client_id and client_secret and keyword:
-        results = getResult(client_id, client_secret, keyword)
-        if results:
-            for i, result in enumerate(results):
-                st.write(f"**{i+1}. {result['Title']}**")
-                st.write(f"  - Blogger ID: {result['Blogger ID']}")
-                st.write(f"  - [Link]({result['Link']})")
-        else:
-            st.write("검색 결과가 없습니다.")
-    else:
-        st.error("Client ID, Client Secret, 그리고 키워드를 모두 입력하세요.")
 
 
 
